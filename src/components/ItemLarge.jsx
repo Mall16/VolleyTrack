@@ -15,7 +15,7 @@ export default function ItemLarge({ item, toggleBookmark, bookmarked }) {
         <Text style={styles.cardTitle}>{item.title}</Text>
         <Text style={styles.cardDescription}>{item.description}</Text>
         <View style={styles.row}>
-        <TouchableOpacity onPress={() => console.log(s.item.title + " Clicked!")}>
+          <TouchableOpacity onPress={() => console.log(`${item.title} Clicked!`)}>
             <Text style={styles.readMoreText}>Read More</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => toggleBookmark(item)}>
@@ -33,10 +33,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 15,
+    flexDirection: 'row',
   },
   imageLarge: {
-    width: '100%',
-    height: 180,
+    width: 120,
+    height: 120,
+    borderRadius: 10,
   },
   imageError: {
     color: '#FFF',
@@ -46,6 +48,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     padding: 10,
+    flex: 1,
   },
   cardTitle: {
     fontSize: 18,

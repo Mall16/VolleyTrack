@@ -37,34 +37,31 @@ const CategoryList = ({ selectedCategory, setSelectedCategory }) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    marginTop: 16,
+    alignItems: 'center', // Pusatkan kategori
     marginBottom: 8,
   },
   centeredList: {
-    justifyContent: 'center',
+    justifyContent: 'center', // Pusatkan elemen dalam FlatList
     flexGrow: 1,
-    paddingVertical: 4,
   },
   categoryButton: {
-    paddingHorizontal: 14,
     paddingVertical: 6,
+    paddingHorizontal: 12,
     backgroundColor: '#222',
-    borderRadius: 18,
-    marginHorizontal: 5,
+    borderRadius: 6,
+    marginHorizontal: 5, // Jarak antar tombol lebih proporsional
     alignItems: 'center',
     justifyContent: 'center',
-    height: 36,
-    minWidth: 70,
+    height: 35,
+    minWidth: 65, // Lebar lebih seragam
   },
   selectedCategory: {
     backgroundColor: '#FFD700',
   },
   categoryText: {
     color: '#FFF',
-    fontSize: 13.5,
-    fontWeight: '600',
-    textAlignVertical: 'center',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   selectedText: {
     color: '#000',

@@ -1,154 +1,199 @@
 import React, { useState } from 'react';
 import {
-  SafeAreaView,
-  View,
   Text,
+  View,
   TextInput,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  SafeAreaView,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import data from './src/data';
-import Index from './src/components';
-import ListHorizontal from './src/components/ListHorizontal';
 import ItemLarge from './src/components/ItemLarge';
+import ItemSmall from './src/components/ItemSmall';
 import BookmarkScreen from './src/screens/bookmark';
 import ProfileScreen from './src/screens/profile';
+import FormScreen from './src/screens/form';
+
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="MainTabs"
+          component={MainTabs}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Form"
+          component={FormScreen}
+          options={{ title: 'Tambah Artikel' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function MainTabs() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#FFD700', // Warna aktif tab
+        tabBarInactiveTintColor: '#888', // Warna tidak aktif tab
+        tabBarStyle: {
+          backgroundColor: '#000', // Warna latar belakang bottom tab
+          borderTopWidth: 0, // Menghilangkan border atas
+        },
+      }}
+    >
+      <Tab.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ tabBarIcon: () => null }} 
+      />
+      <Tab.Screen 
+        name="Bookmark" 
+        component={BookmarkScreen} 
+        options={{ tabBarIcon: () => null }} 
+      />
+      <Tab.Screen 
+        name="Profile" 
+        component={ProfileScreen} 
+        options={{ tabBarIcon: () => null }} 
+      />
+    </Tab.Navigator>
+  );
+}
+
+function HomeScreen({ navigation }) {
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
-  const [search, setSearch] = useState('');
-  const [bookmarked, setBookmarked] = useState([]);
-  const [selectedTab, setSelectedTab] = useState('Home');
 
-  const toggleBookmark = (item) => {
-    const isBookmarked = bookmarked.some((b) => b.title === item.title);
-    if (isBookmarked) {
-      setBookmarked(bookmarked.filter((b) => b.title !== item.title));
-    } else {
-      setBookmarked([...bookmarked, item]);
-    }
-  };
+  const categories = ['Semua', ...new Set(data.map(item => item.category))];
 
-  const filteredData = data.filter((item) => {
-    const categoryMatch =
-      selectedCategory === 'Semua' || item.category === selectedCategory;
-    const searchMatch = item.title
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return categoryMatch && searchMatch;
+  const filteredData = data.filter(item => {
+    const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'Semua' || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
   });
 
-  const renderContent = () => {
-    if (selectedTab === 'Bookmark') {
-      return <BookmarkScreen data={bookmarked} toggleBookmark={toggleBookmark} />;
-    } else if (selectedTab === 'Profile') {
-      return <ProfileScreen />;
-    } else {
-      const featured = filteredData[0];
-      const remaining = filteredData.slice(1);
-
-      return (
-        <>
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Cari Statistik atau Tips"
-            placeholderTextColor="#AAA"
-            value={search}
-            onChangeText={setSearch}
-          />
-          <ListHorizontal
-            setSelectedCategory={setSelectedCategory}
-            selectedCategory={selectedCategory}
-          />
-          <ScrollView style={styles.list}>
-            {featured && (
-              <ItemLarge
-                item={featured}
-                toggleBookmark={toggleBookmark}
-                bookmarked={bookmarked}
-              />
-            )}
-            <Index
-              data={remaining}
-              toggleBookmark={toggleBookmark}
-              bookmarked={bookmarked}
-            />
-          </ScrollView>
-        </>
-      );
-    }
-  };
+  const featured = filteredData.length > 0 ? filteredData[0] : null;
+  const otherArticles = filteredData.slice(1);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>VolleyTrack</Text>
-      {renderContent()}
-      <View style={styles.bottomTabs}>
-        <TouchableOpacity onPress={() => setSelectedTab('Home')}>
-          <Text style={selectedTab === 'Home' ? styles.tabActive : styles.tab}>
-            Home
-          </Text>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+      <ScrollView style={{ padding: 20 }}>
+        <Text style={styles.header}>VolleyTrack</Text>
+
+        <TextInput
+          placeholder="Cari Statistik atau Tips"
+          placeholderTextColor="#888"
+          style={styles.searchInput}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10 }}>
+          {categories.map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.categoryButtonActive,
+              ]}
+              onPress={() => setSelectedCategory(category)}
+            >
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === category && styles.categoryTextActive,
+                ]}
+              >
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {featured && (
+          <>
+            <ItemLarge item={featured} />
+            <Text style={styles.sectionTitle}>Tips & Latihan</Text>
+          </>
+        )}
+
+        {otherArticles.map((item, index) => (
+          <ItemSmall key={index} item={item} />
+        ))}
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Form')}
+          style={styles.addButton}
+        >
+          <Text style={styles.addButtonText}>+ Tambah Artikel</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('Bookmark')}>
-          <Text
-            style={selectedTab === 'Bookmark' ? styles.tabActive : styles.tab}>
-            Bookmark
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => setSelectedTab('Profile')}>
-          <Text
-            style={selectedTab === 'Profile' ? styles.tabActive : styles.tab}>
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-    paddingHorizontal: 15,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  header: {
+    fontSize: 28,
     color: '#FFD700',
-    marginTop: 15,
-    textAlign: 'center',
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
-  searchBar: {
+  searchInput: {
     backgroundColor: '#222',
+    color: '#FFF',
     padding: 10,
     borderRadius: 10,
-    color: '#FFF',
-    marginTop: 15,
+    marginBottom: 10,
   },
-  list: {
-    marginTop: 10,
+  sectionTitle: {
+    fontSize: 20,
+    color: '#FFF',
+    marginTop: 20,
+    marginBottom: 10,
+    fontWeight: '600',
+  },
+  categoryButton: {
+    backgroundColor: '#333',
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  categoryButtonActive: {
+    backgroundColor: '#FFD700',
+  },
+  categoryText: {
+    color: '#FFF',
+    fontSize: 14,
+  },
+  categoryTextActive: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  addButton: {
+    backgroundColor: '#FFD700',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 30,
     marginBottom: 60,
   },
-  bottomTabs: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    backgroundColor: '#111',
-    borderTopWidth: 1,
-    borderColor: '#222',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  tab: {
-    color: '#888',
-    fontSize: 16,
-  },
-  tabActive: {
-    color: '#FFD700',
+  addButtonText: {
+    textAlign: 'center',
+    color: '#000',
     fontWeight: 'bold',
     fontSize: 16,
   },

@@ -1,9 +1,21 @@
-import React from 'react';
-import ItemSmall from "./ItemSmall";
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import ItemSmall from './ItemSmall';
 
-export default function Index({ data, toggleBookmark, bookmarked }) {
+export default function Index({ data }) {
+  const [bookmarked, setBookmarked] = useState([]);
+
+  const toggleBookmark = (item) => {
+    const isBookmarked = bookmarked.some(b => b.title === item.title);
+    if (isBookmarked) {
+      setBookmarked(bookmarked.filter(b => b.title !== item.title));
+    } else {
+      setBookmarked([...bookmarked, item]);
+    }
+  };
+
   return (
-    <>
+    <View>
       {data.map((item, index) => (
         <ItemSmall
           key={index}
@@ -12,6 +24,6 @@ export default function Index({ data, toggleBookmark, bookmarked }) {
           bookmarked={bookmarked}
         />
       ))}
-    </>
+    </View>
   );
 }

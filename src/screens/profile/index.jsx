@@ -1,16 +1,25 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 export default function ProfileScreen() {
   return (
     <View style={styles.container}>
-      <Image
+      <Animatable.Image
+        animation="bounceIn"
+        duration={1000}
         source={{ uri: 'https://ui-avatars.com/api/?name=HIKMAL+FADHILAH' }}
         style={styles.avatar}
       />
-      <Text style={styles.name}>Hikmal Fadhilah</Text>
-      <Text style={styles.detail}>NIM: 2218104</Text>
-      <Text style={styles.email}>Email: 2218104@scholar.itn.ac.id</Text>
+      <Animatable.Text animation="fadeInDown" delay={300} style={styles.name}>
+        Hikmal Fadhilah
+      </Animatable.Text>
+      <Animatable.Text animation="fadeInUp" delay={500} style={styles.detail}>
+        NIM: 2218104
+      </Animatable.Text>
+      <Animatable.Text animation="fadeInUp" delay={700} style={styles.email}>
+        Email: 2218104@scholar.um.ac.id
+      </Animatable.Text>
     </View>
   );
 }

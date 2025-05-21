@@ -8,6 +8,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -46,28 +47,28 @@ function MainTabs() {
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#FFD700', // Warna aktif tab
-        tabBarInactiveTintColor: '#888', // Warna tidak aktif tab
+        tabBarActiveTintColor: '#FFD700',
+        tabBarInactiveTintColor: '#888',
         tabBarStyle: {
-          backgroundColor: '#000', // Warna latar belakang bottom tab
-          borderTopWidth: 0, // Menghilangkan border atas
+          backgroundColor: '#000',
+          borderTopWidth: 0,
         },
       }}
     >
-      <Tab.Screen 
-        name="Home" 
-        component={HomeScreen} 
-        options={{ tabBarIcon: () => null }} 
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{ tabBarIcon: () => null }}
       />
-      <Tab.Screen 
-        name="Bookmark" 
-        component={BookmarkScreen} 
-        options={{ tabBarIcon: () => null }} 
+      <Tab.Screen
+        name="Bookmark"
+        component={BookmarkScreen}
+        options={{ tabBarIcon: () => null }}
       />
-      <Tab.Screen 
-        name="Profile" 
-        component={ProfileScreen} 
-        options={{ tabBarIcon: () => null }} 
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{ tabBarIcon: () => null }}
       />
     </Tab.Navigator>
   );
@@ -76,6 +77,7 @@ function MainTabs() {
 function HomeScreen({ navigation }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Semua');
+  const [bookmarked, setBookmarked] = useState([]);
 
   const categories = ['Semua', ...new Set(data.map(item => item.category))];
 
@@ -88,58 +90,72 @@ function HomeScreen({ navigation }) {
   const featured = filteredData.length > 0 ? filteredData[0] : null;
   const otherArticles = filteredData.slice(1);
 
+  const toggleBookmark = (item) => {
+    const isBookmarked = bookmarked.some((b) => b.title === item.title);
+    if (isBookmarked) {
+      setBookmarked(bookmarked.filter((b) => b.title !== item.title));
+    } else {
+      setBookmarked([...bookmarked, item]);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
       <ScrollView style={{ padding: 20 }}>
-        <Text style={styles.header}>VolleyTrack</Text>
+        <Animatable.Text animation="fadeInDown" duration={800} style={styles.header}>
+          VolleyTrack
+        </Animatable.Text>
 
-        <TextInput
-          placeholder="Cari Statistik atau Tips"
-          placeholderTextColor="#888"
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
+        <Animatable.View animation="fadeInUp" delay={200}>
+          <TextInput
+            placeholder="Cari Statistik atau Tips"
+            placeholderTextColor="#888"
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        </Animatable.View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 10 }}>
           {categories.map((category, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.categoryButtonActive,
-              ]}
-              onPress={() => setSelectedCategory(category)}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === category && styles.categoryTextActive,
-                ]}
+            <Animatable.View key={index} animation="zoomIn" delay={index * 100}>
+              <TouchableOpacity
+                style={[styles.categoryButton, selectedCategory === category && styles.categoryButtonActive]}
+                onPress={() => setSelectedCategory(category)}
               >
-                {category}
-              </Text>
-            </TouchableOpacity>
+                <Text style={[styles.categoryText, selectedCategory === category && styles.categoryTextActive]}>
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            </Animatable.View>
           ))}
         </ScrollView>
 
         {featured && (
           <>
-            <ItemLarge item={featured} />
-            <Text style={styles.sectionTitle}>Tips & Latihan</Text>
+            <Animatable.View animation="fadeInLeft" delay={300}>
+              <ItemLarge item={featured} toggleBookmark={toggleBookmark} bookmarked={bookmarked} />
+            </Animatable.View>
+            <Animatable.Text animation="fadeIn" delay={400} style={styles.sectionTitle}>
+              Tips & Latihan
+            </Animatable.Text>
           </>
         )}
 
         {otherArticles.map((item, index) => (
-          <ItemSmall key={index} item={item} />
+          <Animatable.View key={index} animation="fadeInUp" delay={index * 150}>
+            <ItemSmall item={item} toggleBookmark={toggleBookmark} bookmarked={bookmarked} />
+          </Animatable.View>
         ))}
 
-        <TouchableOpacity
-          onPress={() => navigation.navigate('Form')}
-          style={styles.addButton}
-        >
-          <Text style={styles.addButtonText}>+ Tambah Artikel</Text>
-        </TouchableOpacity>
+        <Animatable.View animation="bounceIn" delay={600}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Form')}
+            style={styles.addButton}
+          >
+            <Text style={styles.addButtonText}>+ Tambah Artikel</Text>
+          </TouchableOpacity>
+        </Animatable.View>
       </ScrollView>
     </SafeAreaView>
   );

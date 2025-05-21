@@ -120,10 +120,18 @@ function HomeScreen({ navigation }) {
           {categories.map((category, index) => (
             <Animatable.View key={index} animation="zoomIn" delay={index * 100}>
               <TouchableOpacity
-                style={[styles.categoryButton, selectedCategory === category && styles.categoryButtonActive]}
+                style={[
+                  styles.categoryButton,
+                  selectedCategory === category && styles.categoryButtonActive,
+                ]}
                 onPress={() => setSelectedCategory(category)}
               >
-                <Text style={[styles.categoryText, selectedCategory === category && styles.categoryTextActive]}>
+                <Text
+                  style={[
+                    styles.categoryText,
+                    selectedCategory === category && styles.categoryTextActive,
+                  ]}
+                >
                   {category}
                 </Text>
               </TouchableOpacity>

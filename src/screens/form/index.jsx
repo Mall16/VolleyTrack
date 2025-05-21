@@ -1,17 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import axios from 'axios';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const FormScreen = () => {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+  const navigation = useNavigation();
+  const route = useRoute();
+  const editData = route.params?.editData;
 
-  const handleSubmit = () => {
-    if (title && category && description) {
-      Alert.alert('Sukses', 'Data berhasil ditambahkan!');
-      setTitle('');
-      setCategory('');
-      setDescription('');
+  const [title, setTitle] = useState(editData?.title || '');
+  const [image, setImage] = useState(editData?.image || '');
+  const [category, setCategory] = useState(editData?.category || '');
+  const [description, setDescription] = useState(editData?.description || '');
+
+  const handleSubmit = async () => {
+    if (title && image && category && description) {
+      try {
+        if (editData) {
+          await axios.put(`https://682601d7397e48c9131499c0.mockapi.io/api/artikel/${editData.id}`, {
+            title, image, category, description,
+          });
+          Alert.alert('Sukses', 'Artikel berhasil diedit!');
+        } else {
+          await axios.post('https://682601d7397e48c9131499c0.mockapi.io/api/artikel', {
+            title, image, category, description,
+          });
+          Alert.alert('Sukses', 'Artikel berhasil ditambahkan!');
+        }
+
+        navigation.goBack();
+      } catch (error) {
+        Alert.alert('Error', 'Gagal menyimpan data');
+      }
     } else {
       Alert.alert('Error', 'Mohon isi semua field');
     }
@@ -19,7 +39,7 @@ const FormScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Form Tambah Artikel</Text>
+      <Text style={styles.title}>{editData ? 'Edit Artikel' : 'Form Tambah Artikel'}</Text>
 
       <TextInput
         style={styles.input}
@@ -28,7 +48,13 @@ const FormScreen = () => {
         value={title}
         onChangeText={setTitle}
       />
-
+      <TextInput
+        style={styles.input}
+        placeholder="URL Gambar"
+        placeholderTextColor="#888"
+        value={image}
+        onChangeText={setImage}
+      />
       <TextInput
         style={styles.input}
         placeholder="Kategori"
@@ -36,7 +62,6 @@ const FormScreen = () => {
         value={category}
         onChangeText={setCategory}
       />
-
       <TextInput
         style={[styles.input, styles.multiline]}
         placeholder="Deskripsi"
@@ -46,8 +71,7 @@ const FormScreen = () => {
         multiline
         numberOfLines={4}
       />
-
-      <Button title="Tambah" color="#FFD700" onPress={handleSubmit} />
+      <Button title={editData ? 'Simpan Perubahan' : 'Tambah'} color="#FFD700" onPress={handleSubmit} />
     </View>
   );
 };

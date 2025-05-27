@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "189272901921",
+    "project_id": "volleytrack-19f95",
+    "storage_bucket": "volleytrack-19f95.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:189272901921:android:531acd6bd3bef150649660",
+        "android_client_info": {
+          "package_name": "com.multitech"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2NiryFtHhOcTCjxblDeF8VsyXZkl3CO0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { db } from '../../firebase/firebaseConfig';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 
 const FormScreen = () => {
   const navigation = useNavigation();
@@ -16,21 +17,19 @@ const FormScreen = () => {
   const handleSubmit = async () => {
     if (title && image && category && description) {
       try {
+        const artikelRef = collection(db, 'artikel');
         if (editData) {
-          await axios.put(`https://682601d7397e48c9131499c0.mockapi.io/api/artikel/${editData.id}`, {
-            title, image, category, description,
-          });
+          const docRef = doc(db, 'artikel', editData.id);
+          await updateDoc(docRef, { title, image, category, description });
           Alert.alert('Sukses', 'Artikel berhasil diedit!');
         } else {
-          await axios.post('https://682601d7397e48c9131499c0.mockapi.io/api/artikel', {
-            title, image, category, description,
-          });
+          await addDoc(artikelRef, { title, image, category, description });
           Alert.alert('Sukses', 'Artikel berhasil ditambahkan!');
         }
-
         navigation.goBack();
       } catch (error) {
         Alert.alert('Error', 'Gagal menyimpan data');
+        console.log(error);
       }
     } else {
       Alert.alert('Error', 'Mohon isi semua field');

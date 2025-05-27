@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, Alert, Button } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { db } from '../../firebase/firebaseConfig';
+import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 export default function ProfileScreen() {
   const [articles, setArticles] = useState([]);
@@ -10,8 +11,12 @@ export default function ProfileScreen() {
 
   const fetchArticles = async () => {
     try {
-      const response = await axios.get('https://682601d7397e48c9131499c0.mockapi.io/api/artikel');
-      setArticles(response.data);
+      const querySnapshot = await getDocs(collection(db, 'artikel'));
+      const list = [];
+      querySnapshot.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      setArticles(list);
     } catch (error) {
       console.error(error);
     }
@@ -19,7 +24,7 @@ export default function ProfileScreen() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`https://682601d7397e48c9131499c0.mockapi.io/api/artikel/${id}`);
+      await deleteDoc(doc(db, 'artikel', id));
       Alert.alert('Sukses', 'Artikel berhasil dihapus');
       fetchArticles();
     } catch (error) {

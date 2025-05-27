@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { db } from '../../firebase/firebaseConfig';
 import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
+import { displayNotification } from '../../utils/notification'; // ✅ Import notifikasi
 
 const FormScreen = () => {
   const navigation = useNavigation();
@@ -25,6 +26,7 @@ const FormScreen = () => {
         } else {
           await addDoc(artikelRef, { title, image, category, description });
           Alert.alert('Sukses', 'Artikel berhasil ditambahkan!');
+          await displayNotification('Artikel Ditambahkan', `"${title}" berhasil disimpan.`); // ✅ Notifikasi ditampilkan
         }
         navigation.goBack();
       } catch (error) {
